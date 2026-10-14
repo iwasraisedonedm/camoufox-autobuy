@@ -6,6 +6,7 @@ from typing import Annotated
 from fastapi import Depends, Header, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from autobuy.orchestration.redis import RedisCoordinator
 from autobuy.settings import get_settings
 
 
@@ -15,6 +16,13 @@ async def get_db_session(request: Request) -> AsyncIterator[AsyncSession]:
 
 
 DbSession = Annotated[AsyncSession, Depends(get_db_session)]
+
+
+def get_coordinator(request: Request) -> RedisCoordinator:
+    return request.app.state.coordinator
+
+
+Coordinator = Annotated[RedisCoordinator, Depends(get_coordinator)]
 
 
 async def require_internal_service(

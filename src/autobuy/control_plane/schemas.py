@@ -6,7 +6,14 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
-from autobuy.domain.enums import CustomerStatus, EntitlementStatus, JobStatus, WorkflowMode
+from autobuy.domain.enums import (
+    CustomerStatus,
+    EntitlementStatus,
+    JobStatus,
+    LeaseStatus,
+    WorkerStatus,
+    WorkflowMode,
+)
 
 
 class CustomerCreate(BaseModel):
@@ -138,3 +145,51 @@ class OrderRead(BaseModel):
     currency: str
     confirmed_at: datetime
     created_at: datetime
+
+
+class WorkerRegisterRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    instance_id: str = Field(min_length=1, max_length=160)
+    version: str = Field(min_length=1, max_length=64)
+
+
+class WorkerRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    instance_id: str
+    status: WorkerStatus
+    version: str
+    last_heartbeat_at: datetime
+    started_at: datetime
+
+
+class LeaseAcquireRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    worker_id: UUID
+    retailer_profile_id: UUID
+
+
+class LeaseRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    worker_id: UUID
+    retailer_profile_id: UUID
+    acquired_at: datetime
+    expires_at: datetime
+    released_at: datetime | None
+    status: LeaseStatus
+
+
+class LeaseAcquireResponse(LeaseRead):
+    lease_token: str
+
+
+class LeaseMutationRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    worker_id: UUID
+    lease_token: str = Field(min_length=32, max_length=512)
