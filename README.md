@@ -21,6 +21,8 @@ The source code and browser automation infrastructure remain server-side.
 
 Auto Purchase is the defining commercial capability. Dry-run and assisted checkout remain supporting modes.
 
+Retailer adapters are transport-agnostic. Monitoring and checkout may use browser automation, a retailer-supported structured integration, or a combination of both, while the control plane and Discord interface remain unchanged.
+
 The latency-critical path is intentionally separated from Discord. Jobs are prepared ahead of availability with authenticated retailer state, normalized product identity, and reusable customer configuration so purchase execution does not wait on chat interaction.
 
 Retailer adapters are transport-agnostic: monitoring and checkout may use a supported structured HTTP interaction, browser automation, or a safe combination of both. The platform chooses the fastest reliable path for each retailer operation without changing control-plane or Discord behavior.
