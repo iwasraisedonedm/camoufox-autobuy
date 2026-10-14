@@ -44,7 +44,7 @@ class RedisCoordinator:
 
     def __init__(self, settings: Settings) -> None:
         self._settings = settings
-        redis_factory = cast(Any, Redis.from_url)
+        redis_factory = cast(Any, Redis.from_url)  # pyright: ignore[reportUnknownMemberType]
         self._redis: Redis = redis_factory(settings.redis_url, decode_responses=True)
         self._prefix = f"{settings.redis_namespace}:{settings.environment}"
 
@@ -55,7 +55,7 @@ class RedisCoordinator:
         await self._redis.aclose()
 
     async def ping(self) -> bool:
-        ping = cast(Any, self._redis.ping)
+        ping = cast(Any, self._redis.ping)  # pyright: ignore[reportUnknownMemberType]
         return bool(await ping())
 
     async def set_worker_heartbeat(self, worker_id: UUID) -> None:
