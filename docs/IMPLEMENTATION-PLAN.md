@@ -175,7 +175,9 @@ Deliver:
 
 - generic worker process
 - retailer adapter registry
-- Patchright browser backend
+- retailer transport abstraction
+- browser automation transport
+- supported structured retailer transport where appropriate
 - Chromium persistent context
 - runtime health
 - structured worker events
@@ -187,7 +189,9 @@ Exit criteria:
 - workers can restore a profile, run monitoring, checkpoint state, and shut down cleanly
 - worker loss in safe states is recoverable
 
-## Phase 8 — Best Buy adapter
+## Phase 8 — Best Buy adapter and transport validation
+
+Transport validation should compare supported implementation options behind the same normalized adapter contract. Monitoring and checkout may use different transports. Selection should be based on measured reliability, latency, session stability, and operational simplicity.
 
 Deliver according to `RETAILER-ADAPTER-SPEC.md`:
 
