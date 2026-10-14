@@ -10,6 +10,8 @@ from fastapi.responses import JSONResponse, Response
 from autobuy.control_plane.routes.customers import router as customers_router
 from autobuy.control_plane.routes.entitlements import router as entitlements_router
 from autobuy.control_plane.routes.health import router as health_router
+from autobuy.control_plane.routes.jobs import router as jobs_router
+from autobuy.control_plane.routes.targets import router as targets_router
 from autobuy.domain.errors import DomainError
 from autobuy.observability.logging import configure_logging
 from autobuy.persistence.database import Database
@@ -62,4 +64,6 @@ def create_app() -> FastAPI:
     app.include_router(health_router)
     app.include_router(customers_router)
     app.include_router(entitlements_router)
+    app.include_router(targets_router)
+    app.include_router(jobs_router)
     return app
