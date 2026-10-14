@@ -1,6 +1,7 @@
 """Entitlement grant and validation application service."""
 
 from datetime import UTC, datetime
+from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,8 +14,8 @@ from autobuy.persistence.models import CustomerAccount, RetailerOffering, Servic
 async def grant_entitlement(
     session: AsyncSession,
     *,
-    customer_id,
-    retailer_offering_id,
+    customer_id: UUID,
+    retailer_offering_id: UUID,
     starts_at: datetime,
     expires_at: datetime,
     concurrent_job_limit: int,
