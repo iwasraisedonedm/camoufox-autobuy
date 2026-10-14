@@ -21,6 +21,7 @@ Each document has one primary responsibility. Avoid duplicating normative rules 
 | `DEPLOYMENT.md` | V1 production deployment and operations |
 | `TESTING.md` | Test layers, CI policy, and controlled live testing |
 | `RETAILER-ADAPTER-SPEC.md` | Contract for each supported retailer integration |
+| `RETAILER-TRANSPORT-STRATEGY.md` | Transport-selection rules inside retailer adapters |
 | `PRICING-ENTITLEMENTS.md` | Commercial entitlement mechanics |
 | `NON-GOALS.md` | Explicit scope exclusions |
 | `V1-ACCEPTANCE.md` | Product release acceptance bar |
