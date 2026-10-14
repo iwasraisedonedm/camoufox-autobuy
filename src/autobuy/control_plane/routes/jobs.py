@@ -4,9 +4,9 @@ from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, status
 
-from autobuy.control_plane.dependencies import DbSession
+from autobuy.control_plane.dependencies import Coordinator, DbSession
 from autobuy.control_plane.schemas import MonitoringJobCreate, MonitoringJobRead
-from autobuy.control_plane.services.jobs import create_monitoring_job
+from autobuy.control_plane.services.jobs import create_monitoring_job, start_monitoring_job
 from autobuy.domain.enums import WorkflowMode
 from autobuy.persistence.models import MonitoringJob
 
@@ -44,3 +44,13 @@ async def get_job(job_id: UUID, session: DbSession) -> MonitoringJob:
     if job is None:
         raise HTTPException(status_code=404, detail="Job not found")
     return job
+
+
+
+@router.post("/{job_id}/start", response_model=MonitoringJobRead)
+async def start_job(
+    job_id: UUID,
+    session: DbSession,
+    coordinator: Coordinator,
+) -> MonitoringJob:
+    return await start_monitoring_job(session, coordinator, job_id=job_id)

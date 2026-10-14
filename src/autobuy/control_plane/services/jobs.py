@@ -9,10 +9,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from autobuy.domain.enums import EntitlementStatus, JobStatus, RetailerProfileStatus, WorkflowMode
 from autobuy.domain.errors import DomainError, ErrorCode
+from autobuy.orchestration.redis import RedisCoordinator
 from autobuy.persistence.models import (
     JobEvent,
     MonitoringJob,
     PurchaseTarget,
+    RetailerOffering,
     RetailerProfile,
     ServiceEntitlement,
 )
@@ -146,4 +148,52 @@ async def create_monitoring_job(
     )
     await session.commit()
     await session.refresh(job)
+    return job
+
+
+
+async def start_monitoring_job(
+    session: AsyncSession,
+    coordinator: RedisCoordinator,
+    *,
+    job_id: UUID,
+) -> MonitoringJob:
+    job = await session.scalar(
+        select(MonitoringJob).where(MonitoringJob.id == job_id).with_for_update()
+    )
+    if job is None:
+        raise DomainError(ErrorCode.JOB_NOT_FOUND, "Monitoring job does not exist")
+    if job.status == JobStatus.QUEUED:
+        return job
+    if job.status != JobStatus.READY:
+        raise DomainError(ErrorCode.JOB_NOT_ACTIVE, "Monitoring job is not ready to start")
+
+    now = datetime.now(UTC)
+    if job.expires_at <= now:
+        job.status = JobStatus.EXPIRED
+        await session.commit()
+        raise DomainError(ErrorCode.ENTITLEMENT_EXPIRED, "Monitoring job has expired")
+
+    target = await session.get(PurchaseTarget, job.purchase_target_id)
+    if target is None:
+        raise DomainError(ErrorCode.INVALID_TARGET, "Purchase target is unavailable")
+
+    offering = await session.get(RetailerOffering, target.retailer_offering_id)
+    if offering is None or offering.status != "active":
+        raise DomainError(ErrorCode.RETAILER_UNAVAILABLE, "Retailer offering is unavailable")
+
+    job.status = JobStatus.QUEUED
+    if job.started_at is None:
+        job.started_at = now
+    session.add(
+        JobEvent(
+            job_id=job.id,
+            event_type="JOB_QUEUED",
+            payload_json={"retailer_code": offering.retailer_code},
+        )
+    )
+    await session.commit()
+    await session.refresh(job)
+
+    await coordinator.enqueue_job(offering.retailer_code, job.id)
     return job
