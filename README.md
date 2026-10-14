@@ -21,6 +21,10 @@ The source code and browser automation infrastructure remain server-side.
 
 Auto Purchase is the defining commercial capability. Dry-run and assisted checkout remain supporting modes.
 
+The latency-critical path is intentionally separated from Discord. Jobs are prepared ahead of availability with authenticated retailer state, normalized product identity, and reusable customer configuration so purchase execution does not wait on chat interaction.
+
+Retailer adapters are transport-agnostic: monitoring and checkout may use a supported structured HTTP interaction, browser automation, or a safe combination of both. The platform chooses the fastest reliable path for each retailer operation without changing control-plane or Discord behavior.
+
 ## High-level architecture
 
 ```text
@@ -40,7 +44,10 @@ Retailer Queue
    |
 Isolated Worker Runtime
    |
-Patchright + Chromium
+Retailer Adapter
+   |
+   +-- Structured HTTP transport where supported/reliable
+   +-- Patchright + Chromium browser transport
    |
 Supported Retailer
 ```
@@ -90,9 +97,10 @@ Worker plane:
 
 - Python 3.12+
 - asyncio
-- Patchright
-- Chromium
 - retailer adapters
+- transport-specific monitor/checkout strategies
+- Patchright + Chromium where browser automation is the reliable path
+- authenticated structured HTTP where a retailer operation legitimately supports it
 - encrypted retailer profile storage
 
 Development:
