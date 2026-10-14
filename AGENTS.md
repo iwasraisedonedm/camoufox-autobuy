@@ -38,6 +38,7 @@ Do not silently override an accepted decision. If implementation reality conflic
 - `docs/DEPLOYMENT.md` — production deployment
 - `docs/TESTING.md` — test and CI policy
 - `docs/RETAILER-ADAPTER-SPEC.md` — retailer adapter contract
+- `docs/RETAILER-TRANSPORT-STRATEGY.md` — retailer transport-selection rules
 - `docs/PRICING-ENTITLEMENTS.md` — entitlement mechanics
 - `docs/NON-GOALS.md` — explicit scope exclusions
 - `docs/V1-ACCEPTANCE.md` — release bar
