@@ -34,7 +34,7 @@ A customer may hold multiple active service entitlements and retailer sessions.
 
 A commercial right to use a supported automation service under purchased limits.
 
-Packaging may vary by retailer, duration, number of products/jobs, and number of successful purchases. The final pricing model remains unresolved.
+Commercial packaging is based on retailer access plus purchased limits such as duration, concurrent monitored products/jobs, and successful purchase allowance. Failed purchase attempts do not consume successful-purchase allowance. Public package names and prices remain unresolved.
 
 A service entitlement is distinct from a Purchase Target, Monitoring Job, and Retailer Session.
 
@@ -94,7 +94,7 @@ The preferred lifecycle is to retain the runtime for a configurable idle period,
 
 ## Purchase Target
 
-A retailer-specific item the customer wants monitored and potentially purchased.
+A reusable retailer-specific item definition the customer wants monitored and potentially purchased.
 
 For v1, a Purchase Target includes:
 
@@ -114,7 +114,7 @@ The domain should remain capable of later representing one logical desired item 
 
 ## Monitoring Job
 
-An active instruction to watch one configured Purchase Target for one customer.
+A single execution lifecycle for one configured Purchase Target and one customer.
 
 A Monitoring Job belongs to a Customer and a Supported Retailer and remains active until it succeeds, expires, is stopped, reaches its configured success limit, or enters an unrecoverable state.
 
@@ -189,7 +189,7 @@ Workers recover safe monitoring states automatically after failure. Irreversible
 
 ## Successful Purchase Allowance
 
-A purchased usage allowance measured by confirmed successful units/orders rather than failed attempts. Concurrent monitoring capacity is metered separately from successful purchase allowance.
+A purchased usage allowance measured by confirmed successful units rather than failed attempts. If one confirmed order contains multiple units, each confirmed unit consumes allowance. Concurrent monitoring capacity is metered separately from successful purchase allowance.
 
 ## Hosted Operator Service
 
@@ -197,11 +197,41 @@ The provider-operated service that runs the commercial bot and its retailer auto
 
 Customers interact with it remotely through the messaging interface and do not need direct access to the source code or automation host.
 
+## Concurrent Job Limit
+
+The maximum number of Purchase Targets a customer may actively monitor at the same time under a Service Entitlement.
+
+Concurrent Job Limit is distinct from Successful Purchase Allowance.
+
+## Partial Fulfillment
+
+A purchase outcome where fewer units are confirmed than the job requested.
+
+For v1, partial fulfillment is not intentionally accepted by default. If partial fulfillment occurs, only confirmed units consume Successful Purchase Allowance and the remaining requested quantity requires explicit job policy before continuing.
+
+## Entitlement Exhaustion
+
+The point at which a Service Entitlement is no longer valid because either its time window has expired or its Successful Purchase Allowance has reached zero.
+
+No new purchase attempt may begin after entitlement exhaustion.
+
+## Job Status Card
+
+A persistent customer-facing status representation for a Monitoring Job in Discord.
+
+A Job Status Card is updated as the job changes state. Important terminal events may also generate separate push notifications, while an on-demand status command returns current state.
+
+## Retailer Offering
+
+A customer-facing commercial product for one Supported Retailer, backed by the same shared platform and domain model.
+
+Retailer offerings may be branded and sold separately even though they use the same underlying service architecture.
+
 ## Operator Control Plane
 
 The provider-only interface for managing customers, entitlements, jobs, retailer/session health, workers, errors, and operational status.
 
-The initial control plane should use CLI and/or Discord admin commands. A dedicated internal web admin panel may be added later. Discord is an interface only and is never the source of truth.
+The initial control plane should use CLI and/or Discord admin commands. A dedicated internal web admin panel may be added later. Discord is an interface only and is never the source of truth. Customer, entitlement, job, purchase, and retailer-session state belong to the service backend.
 
 ## Payment Method for Retailer Purchase
 
