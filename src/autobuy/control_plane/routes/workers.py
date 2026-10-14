@@ -10,11 +10,13 @@ from autobuy.control_plane.schemas import (
     LeaseAcquireResponse,
     LeaseMutationRequest,
     LeaseRead,
+    LeaseReapResponse,
     WorkerRead,
     WorkerRegisterRequest,
 )
 from autobuy.control_plane.services.workers import (
     acquire_lease,
+    expire_stale_leases,
     heartbeat_worker,
     register_worker,
     release_lease,
@@ -100,3 +102,14 @@ async def release_lease_route(
         worker_id=payload.worker_id,
         lease_token=payload.lease_token,
     )
+
+
+
+@router.post("/leases/reap-expired", response_model=LeaseReapResponse)
+async def reap_expired_leases_route(
+    session: DbSession,
+    coordinator: Coordinator,
+    _: InternalService,
+) -> LeaseReapResponse:
+    expired = await expire_stale_leases(session, coordinator)
+    return LeaseReapResponse(expired_leases=expired)

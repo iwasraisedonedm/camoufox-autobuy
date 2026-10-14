@@ -10,11 +10,40 @@ from uuid import UUID
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from autobuy.domain.enums import LeaseStatus, RetailerProfileStatus, WorkerStatus
+from autobuy.domain.enums import JobStatus, LeaseStatus, RetailerProfileStatus, WorkerStatus
 from autobuy.domain.errors import DomainError, ErrorCode
 from autobuy.orchestration.redis import RedisCoordinator, generate_lease_token
-from autobuy.persistence.models import RetailerProfile, Worker, WorkerLease
+from autobuy.persistence.models import (
+    JobEvent,
+    MonitoringJob,
+    PurchaseTarget,
+    RetailerOffering,
+    RetailerProfile,
+    Worker,
+    WorkerLease,
+)
 from autobuy.settings import Settings
+
+SAFE_RECOVERY_JOB_STATUSES: frozenset[JobStatus] = frozenset(
+    {
+        JobStatus.READY,
+        JobStatus.QUEUED,
+        JobStatus.MONITORING,
+        JobStatus.ITEM_FOUND,
+        JobStatus.VALIDATING,
+    }
+)
+
+REVIEW_RECOVERY_JOB_STATUSES: frozenset[JobStatus] = frozenset(
+    {
+        JobStatus.ADDING_TO_CART,
+        JobStatus.CART_CONFIRMED,
+        JobStatus.CHECKOUT_PREPARING,
+        JobStatus.CHECKOUT_READY,
+        JobStatus.AWAITING_CONFIRMATION,
+        JobStatus.PURCHASE_AUTHORIZED,
+    }
+)
 
 
 def _hash_token(raw: str) -> str:
@@ -228,3 +257,102 @@ async def release_lease(
     await coordinator.release_profile_lock(lease.retailer_profile_id, lease.id)
     await session.refresh(lease)
     return lease
+
+
+
+async def expire_stale_leases(
+    session: AsyncSession,
+    coordinator: RedisCoordinator,
+) -> int:
+    now = datetime.now(UTC)
+    leases = list(
+        (
+            await session.scalars(
+                select(WorkerLease)
+                .where(
+                    WorkerLease.status == LeaseStatus.ACTIVE,
+                    WorkerLease.expires_at <= now,
+                )
+                .with_for_update(skip_locked=True)
+            )
+        ).all()
+    )
+    if not leases:
+        return 0
+
+    requeue: list[tuple[str, UUID]] = []
+
+    for lease in leases:
+        lease.status = LeaseStatus.EXPIRED
+        lease.released_at = now
+
+        profile = await session.get(RetailerProfile, lease.retailer_profile_id)
+        if profile is not None and profile.status == RetailerProfileStatus.LOCKED:
+            profile.status = RetailerProfileStatus.READY
+
+        worker = await session.get(Worker, lease.worker_id)
+        if worker is not None and not await coordinator.has_worker_heartbeat(worker.id):
+            worker.status = WorkerStatus.LOST
+
+        jobs = list(
+            (
+                await session.scalars(
+                    select(MonitoringJob).where(
+                        MonitoringJob.retailer_profile_id == lease.retailer_profile_id,
+                        MonitoringJob.status.in_(
+                            SAFE_RECOVERY_JOB_STATUSES
+                            | REVIEW_RECOVERY_JOB_STATUSES
+                            | {JobStatus.SUBMITTING, JobStatus.AMBIGUOUS}
+                        ),
+                    )
+                )
+            ).all()
+        )
+
+        for job in jobs:
+            if job.status in SAFE_RECOVERY_JOB_STATUSES:
+                target = await session.get(PurchaseTarget, job.purchase_target_id)
+                offering = (
+                    await session.get(RetailerOffering, target.retailer_offering_id)
+                    if target is not None
+                    else None
+                )
+                if offering is not None and offering.status == "active":
+                    job.status = JobStatus.QUEUED
+                    session.add(
+                        JobEvent(
+                            job_id=job.id,
+                            event_type="JOB_RECOVERED_AFTER_LEASE_EXPIRY",
+                            payload_json={"retailer_code": offering.retailer_code},
+                        )
+                    )
+                    requeue.append((offering.retailer_code, job.id))
+                else:
+                    job.status = JobStatus.ACTION_REQUIRED
+            elif job.status == JobStatus.SUBMITTING:
+                job.status = JobStatus.AMBIGUOUS
+                session.add(
+                    JobEvent(
+                        job_id=job.id,
+                        event_type="PURCHASE_AMBIGUOUS_AFTER_WORKER_LOSS",
+                        payload_json={},
+                    )
+                )
+            elif job.status in REVIEW_RECOVERY_JOB_STATUSES:
+                job.status = JobStatus.ACTION_REQUIRED
+                session.add(
+                    JobEvent(
+                        job_id=job.id,
+                        event_type="RECOVERY_REVIEW_REQUIRED",
+                        payload_json={},
+                    )
+                )
+
+        await coordinator.release_profile_lock(lease.retailer_profile_id, lease.id)
+
+    await session.commit()
+
+    for retailer_code, job_id in requeue:
+        await coordinator.enqueue_job(retailer_code, job_id)
+
+    return len(leases)

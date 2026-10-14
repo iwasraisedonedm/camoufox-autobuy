@@ -193,3 +193,8 @@ class LeaseMutationRequest(BaseModel):
 
     worker_id: UUID
     lease_token: str = Field(min_length=32, max_length=512)
+
+
+
+class LeaseReapResponse(BaseModel):
+    expired_leases: int = Field(ge=0)
