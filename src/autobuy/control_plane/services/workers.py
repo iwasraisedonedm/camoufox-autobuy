@@ -259,7 +259,6 @@ async def release_lease(
     return lease
 
 
-
 async def expire_stale_leases(
     session: AsyncSession,
     coordinator: RedisCoordinator,

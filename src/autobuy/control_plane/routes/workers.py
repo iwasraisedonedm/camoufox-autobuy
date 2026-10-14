@@ -104,7 +104,6 @@ async def release_lease_route(
     )
 
 
-
 @router.post("/leases/reap-expired", response_model=LeaseReapResponse)
 async def reap_expired_leases_route(
     session: DbSession,
