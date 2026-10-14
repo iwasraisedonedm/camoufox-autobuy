@@ -1,0 +1,15 @@
+monitoring:
+  enabled: true
+  default_interval_seconds: 3.0
+  jitter_seconds: 0.25
+  max_concurrent_jobs: 4
+
+  backoff:
+    enabled: true
+    initial_seconds: 1.0
+    max_seconds: 30.0
+    multiplier: 2.0
+
+  health:
+    stale_after_seconds: 60
+    fail_after_consecutive_errors: 10
