@@ -1,6 +1,8 @@
 """Production-safe structured logging."""
 
 import logging
+from collections.abc import MutableMapping
+from typing import Any
 
 import structlog
 
@@ -18,7 +20,11 @@ REDACT_KEYS = {
 }
 
 
-def _redact(_: object, __: str, event_dict: dict[str, object]) -> dict[str, object]:
+def _redact(
+    _: object,
+    __: str,
+    event_dict: MutableMapping[str, Any],
+) -> MutableMapping[str, Any]:
     for key in tuple(event_dict):
         if key.lower() in REDACT_KEYS:
             event_dict[key] = "[REDACTED]"
