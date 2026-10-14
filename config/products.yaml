@@ -1,8 +1,14 @@
 products:
-  example:
-    retailer: target
+  example_product:
+    enabled: false
+    retailer: example_retailer
     url: "https://example.com/product"
     quantity: 1
-    max_price: 749.99
-    profile: personal
-    enabled: false
+    max_unit_price: 100.00
+    profile_ref: default
+    variant:
+      required: false
+      expected_id: null
+    limits:
+      max_successful_orders: 1
+      disable_after_success: true
