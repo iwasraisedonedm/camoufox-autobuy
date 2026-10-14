@@ -6,6 +6,10 @@ Defines the contract between the control plane/orchestrator and isolated retaile
 
 ## Principles
 
+- transport abstraction is internal to the retailer adapter and worker runtime
+- Discord and the control plane remain transport-independent
+
+
 - Workers are disposable compute.
 - PostgreSQL owns durable truth.
 - Redis coordinates ephemeral work.
