@@ -242,3 +242,18 @@ This remains separate from the Unlock Service and still requires a final product
 ## Commercial MVP
 
 The first sellable milestone must retain Auto Purchase as the defining product capability. Assisted checkout and dry-run remain supported modes, but the commercial product is not considered complete merely because it can monitor or prepare checkout. A confirmed successful automated purchase is the core success criterion.
+
+
+## Retailer Transport
+
+The internal execution mechanism used by a Supported Retailer adapter for a particular operation.
+
+A Retailer Transport may be browser automation, a retailer-supported structured integration, or another explicitly supported mechanism. Monitoring transport and checkout transport may differ.
+
+Transport selection is internal to the retailer adapter and does not change Customer, Monitoring Job, entitlement, or customer-facing Bot State semantics.
+
+## Warm Retailer Runtime
+
+A prepared Customer Retailer Profile runtime with authenticated retailer state and required execution prerequisites already available before a Monitoring Job needs to act.
+
+A Warm Retailer Runtime exists to keep avoidable setup work outside active monitoring and checkout execution.
