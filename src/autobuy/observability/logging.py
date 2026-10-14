@@ -4,7 +4,6 @@ import logging
 
 import structlog
 
-
 REDACT_KEYS = {
     "password",
     "authorization",

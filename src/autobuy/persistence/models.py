@@ -5,13 +5,12 @@ from decimal import Decimal
 from uuid import UUID
 
 from sqlalchemy import (
+    JSON,
     CheckConstraint,
     DateTime,
-    Enum as SAEnum,
     ForeignKey,
     Index,
     Integer,
-    JSON,
     Numeric,
     String,
     Text,
@@ -19,6 +18,7 @@ from sqlalchemy import (
     Uuid,
     text,
 )
+from sqlalchemy import Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column
 
 from autobuy.domain.enums import (
@@ -32,7 +32,12 @@ from autobuy.domain.enums import (
     WorkerStatus,
     WorkflowMode,
 )
-from autobuy.persistence.base import Base, TimestampMixin, UUIDPrimaryKeyMixin, utcnow
+from autobuy.persistence.base import (
+    Base,
+    TimestampMixin,
+    UUIDPrimaryKeyMixin,
+    utcnow,
+)
 
 
 class CustomerAccount(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -68,7 +73,9 @@ class RetailerOffering(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     retailer_code: Mapped[str] = mapped_column(String(64), unique=True, index=True)
     display_name: Mapped[str] = mapped_column(String(120))
     status: Mapped[str] = mapped_column(String(32), default="active", nullable=False)
-    adapter_version: Mapped[str] = mapped_column(String(64), default="0.1.0", nullable=False)
+    adapter_version: Mapped[str] = mapped_column(
+        String(64), default="0.1.0", nullable=False
+    )
 
 
 class ServiceEntitlement(UUIDPrimaryKeyMixin, Base):
@@ -317,7 +324,9 @@ class Order(UUIDPrimaryKeyMixin, Base):
         ForeignKey("purchase_attempts.id", ondelete="RESTRICT"),
         unique=True,
     )
-    retailer_order_reference: Mapped[str] = mapped_column(String(200), nullable=False)
+    retailer_order_reference: Mapped[str] = mapped_column(
+        String(200), nullable=False
+    )
     quantity_confirmed: Mapped[int] = mapped_column(Integer, nullable=False)
     unit_price: Mapped[Decimal | None] = mapped_column(Numeric(12, 2))
     currency: Mapped[str] = mapped_column(String(3), default="USD", nullable=False)
@@ -341,7 +350,9 @@ class JobEvent(UUIDPrimaryKeyMixin, Base):
         ForeignKey("purchase_attempts.id", ondelete="SET NULL"),
     )
     event_type: Mapped[str] = mapped_column(String(80), nullable=False)
-    payload_json: Mapped[dict[str, object]] = mapped_column(JSON, default=dict, nullable=False)
+    payload_json: Mapped[dict[str, object]] = mapped_column(
+        JSON, default=dict, nullable=False
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=utcnow, nullable=False
     )
@@ -388,7 +399,9 @@ class WorkerLease(UUIDPrimaryKeyMixin, Base):
         ForeignKey("retailer_profiles.id", ondelete="CASCADE"),
         index=True,
     )
-    lease_token_hash: Mapped[str] = mapped_column(String(128), unique=True, nullable=False)
+    lease_token_hash: Mapped[str] = mapped_column(
+        String(128), unique=True, nullable=False
+    )
     acquired_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=utcnow, nullable=False
     )
@@ -417,7 +430,9 @@ class RetailerHealthSnapshot(UUIDPrimaryKeyMixin, Base):
         SAEnum(RetailerHealth, native_enum=False, validate_strings=True),
         nullable=False,
     )
-    metrics_json: Mapped[dict[str, object]] = mapped_column(JSON, default=dict, nullable=False)
+    metrics_json: Mapped[dict[str, object]] = mapped_column(
+        JSON, default=dict, nullable=False
+    )
     observed_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=utcnow, nullable=False, index=True
     )

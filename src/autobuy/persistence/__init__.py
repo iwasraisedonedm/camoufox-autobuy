@@ -19,8 +19,8 @@ from autobuy.persistence.models import (
 )
 
 __all__ = [
-    "Base",
     "AccountLinkSession",
+    "Base",
     "CustomerAccount",
     "DiscordIdentity",
     "JobEvent",

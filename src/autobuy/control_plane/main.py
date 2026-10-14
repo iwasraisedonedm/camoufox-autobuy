@@ -2,7 +2,6 @@
 
 import uvicorn
 
-from autobuy.control_plane.app import create_app
 from autobuy.settings import get_settings
 
 
