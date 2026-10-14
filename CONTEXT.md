@@ -181,9 +181,19 @@ Canonical customer-facing states are:
 
 These customer-facing states may map to more detailed internal workflow states.
 
+## Worker Lease
+
+A temporary assignment of an isolated execution worker/container to an active customer job. Customer identity and retailer profile ownership remain persistent, while compute is dynamically assigned.
+
+Workers recover safe monitoring states automatically after failure. Irreversible or ambiguous purchase stages require reconciliation before any replacement worker may retry.
+
+## Successful Purchase Allowance
+
+A purchased usage allowance measured by confirmed successful units/orders rather than failed attempts. Concurrent monitoring capacity is metered separately from successful purchase allowance.
+
 ## Hosted Operator Service
 
-The provider-operated service that runs the commercial bot and its retailer automation.
+The provider-operated service that runs the commercial bot and its retailer automation. The system is split into a central control plane and an isolated worker plane.
 
 Customers interact with it remotely through the messaging interface and do not need direct access to the source code or automation host.
 
@@ -191,10 +201,14 @@ Customers interact with it remotely through the messaging interface and do not n
 
 The provider-only interface for managing customers, entitlements, jobs, retailer/session health, workers, errors, and operational status.
 
-The initial control plane should use CLI and/or Discord admin commands. A dedicated internal web admin panel may be added later.
+The initial control plane should use CLI and/or Discord admin commands. A dedicated internal web admin panel may be added later. Discord is an interface only and is never the source of truth.
 
 ## Payment Method for Retailer Purchase
 
 The mechanism used to fund a retailer purchase for a customer.
 
 This remains separate from the Unlock Service and still requires a final product decision.
+
+## Commercial MVP
+
+The first sellable milestone must retain Auto Purchase as the defining product capability. Assisted checkout and dry-run remain supported modes, but the commercial product is not considered complete merely because it can monitor or prepare checkout. A confirmed successful automated purchase is the core success criterion.
