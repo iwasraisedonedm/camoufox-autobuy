@@ -57,9 +57,7 @@ async def create_monitoring_job(
     now = datetime.now(UTC)
 
     entitlement = await session.scalar(
-        select(ServiceEntitlement)
-        .where(ServiceEntitlement.id == entitlement_id)
-        .with_for_update()
+        select(ServiceEntitlement).where(ServiceEntitlement.id == entitlement_id).with_for_update()
     )
     if entitlement is None or entitlement.customer_id != customer_id:
         raise DomainError(ErrorCode.ENTITLEMENT_REQUIRED, "Entitlement is unavailable")
@@ -72,8 +70,7 @@ async def create_monitoring_job(
         raise DomainError(ErrorCode.ENTITLEMENT_EXPIRED, "Entitlement has expired")
 
     remaining = (
-        entitlement.successful_unit_allowance_total
-        - entitlement.successful_unit_allowance_used
+        entitlement.successful_unit_allowance_total - entitlement.successful_unit_allowance_used
     )
     if remaining <= 0:
         raise DomainError(ErrorCode.ALLOWANCE_EXHAUSTED, "Purchase allowance is exhausted")
