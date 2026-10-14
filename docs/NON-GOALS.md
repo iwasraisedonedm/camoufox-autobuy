@@ -47,3 +47,8 @@ Do not optimize for:
 The initial product is a curated supported-retailer AutoBuy service, not a general browser automation marketplace.
 
 Best Buy is the reference retailer. Future retailers are added deliberately based on commercial demand and technical readiness.
+
+
+## Transport scope
+
+V1 does not require a single-transport design. Retailer integrations may use different supported implementation mechanisms behind the same adapter contract.
