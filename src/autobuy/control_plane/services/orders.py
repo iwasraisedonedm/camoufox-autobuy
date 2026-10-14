@@ -26,16 +26,12 @@ async def confirm_order(
     currency: str,
     confirmed_at,
 ) -> Order:
-    existing = await session.scalar(
-        select(Order).where(Order.purchase_attempt_id == attempt_id)
-    )
+    existing = await session.scalar(select(Order).where(Order.purchase_attempt_id == attempt_id))
     if existing is not None:
         return existing
 
     attempt = await session.scalar(
-        select(PurchaseAttempt)
-        .where(PurchaseAttempt.id == attempt_id)
-        .with_for_update()
+        select(PurchaseAttempt).where(PurchaseAttempt.id == attempt_id).with_for_update()
     )
     if attempt is None:
         raise DomainError(
@@ -53,9 +49,7 @@ async def confirm_order(
         )
 
     job = await session.scalar(
-        select(MonitoringJob)
-        .where(MonitoringJob.id == attempt.job_id)
-        .with_for_update()
+        select(MonitoringJob).where(MonitoringJob.id == attempt.job_id).with_for_update()
     )
     if job is None:
         raise DomainError(ErrorCode.JOB_NOT_FOUND, "Monitoring job does not exist")
@@ -72,8 +66,7 @@ async def confirm_order(
         )
 
     remaining = (
-        entitlement.successful_unit_allowance_total
-        - entitlement.successful_unit_allowance_used
+        entitlement.successful_unit_allowance_total - entitlement.successful_unit_allowance_used
     )
     if quantity_confirmed > remaining:
         raise DomainError(
@@ -95,10 +88,7 @@ async def confirm_order(
     session.add(order)
 
     entitlement.successful_unit_allowance_used += quantity_confirmed
-    if (
-        entitlement.successful_unit_allowance_used
-        >= entitlement.successful_unit_allowance_total
-    ):
+    if entitlement.successful_unit_allowance_used >= entitlement.successful_unit_allowance_total:
         entitlement.status = EntitlementStatus.EXHAUSTED
 
     attempt.state = AttemptStatus.CONFIRMED
