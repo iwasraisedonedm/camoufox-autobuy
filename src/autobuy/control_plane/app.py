@@ -15,6 +15,7 @@ from autobuy.control_plane.routes.orders import router as orders_router
 from autobuy.control_plane.routes.targets import router as targets_router
 from autobuy.domain.errors import DomainError
 from autobuy.observability.logging import configure_logging
+from autobuy.orchestration.redis import RedisCoordinator
 from autobuy.persistence.database import Database
 from autobuy.settings import get_settings
 
@@ -23,10 +24,12 @@ def create_app() -> FastAPI:
     settings = get_settings()
     configure_logging(settings.log_level)
     database = Database(settings)
+    coordinator = RedisCoordinator(settings)
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncGenerator[None, None]:
         yield
+        await coordinator.close()
         await database.close()
 
     app = FastAPI(
@@ -35,6 +38,7 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
     app.state.database = database
+    app.state.coordinator = coordinator
 
     @app.middleware("http")
     async def request_id_middleware(
