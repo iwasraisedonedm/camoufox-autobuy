@@ -1,6 +1,7 @@
 """Application settings."""
 
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -24,6 +25,7 @@ class Settings(BaseSettings):
     redis_namespace: str = "autobuy"
     worker_heartbeat_ttl_seconds: int = Field(default=30, ge=5, le=300)
     worker_lease_ttl_seconds: int = Field(default=45, ge=10, le=600)
+    profile_store_dir: Path = Path("data/profile-artifacts")
 
 
 @lru_cache
