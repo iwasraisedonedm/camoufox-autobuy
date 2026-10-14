@@ -85,6 +85,10 @@ class RedisCoordinator:
             )
         )
 
+    async def owns_profile_lock(self, profile_id: UUID, lease_id: UUID) -> bool:
+        current = await self._redis.get(self._key("profile", profile_id, "lease"))
+        return current == str(lease_id)
+
     async def renew_profile_lock(
         self,
         profile_id: UUID,

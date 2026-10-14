@@ -197,3 +197,22 @@ class LeaseMutationRequest(BaseModel):
 
 class LeaseReapResponse(BaseModel):
     expired_leases: int = Field(ge=0)
+
+
+class ProfileArtifactAccessRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    worker_id: UUID
+    lease_id: UUID
+    lease_token: str = Field(min_length=32, max_length=512)
+
+
+class ProfileArtifactMetadataRead(BaseModel):
+    profile_id: UUID
+    encrypted_artifact_ref: str | None
+    artifact_version: int = Field(ge=0)
+
+
+class ProfileArtifactCheckpointRequest(ProfileArtifactAccessRequest):
+    encrypted_artifact_ref: str = Field(min_length=1, max_length=2048)
+    artifact_version: int = Field(ge=1)

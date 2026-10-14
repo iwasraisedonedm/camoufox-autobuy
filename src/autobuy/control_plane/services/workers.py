@@ -179,6 +179,29 @@ async def acquire_lease(
     return lease, token.raw
 
 
+async def validate_active_lease(
+    session: AsyncSession,
+    coordinator: RedisCoordinator,
+    *,
+    lease_id: UUID,
+    worker_id: UUID,
+    retailer_profile_id: UUID,
+    lease_token: str,
+) -> WorkerLease:
+    lease = await session.get(WorkerLease, lease_id)
+    if lease is None or lease.status != LeaseStatus.ACTIVE:
+        raise DomainError(ErrorCode.LEASE_INVALID, "Lease is not active")
+    if lease.worker_id != worker_id or lease.retailer_profile_id != retailer_profile_id:
+        raise DomainError(ErrorCode.LEASE_INVALID, "Lease does not match worker/profile")
+    if lease.expires_at <= datetime.now(UTC):
+        raise DomainError(ErrorCode.LEASE_EXPIRED, "Lease has expired")
+    if not hmac.compare_digest(lease.lease_token_hash, _hash_token(lease_token)):
+        raise DomainError(ErrorCode.LEASE_INVALID, "Lease token is invalid")
+    if not await coordinator.owns_profile_lock(retailer_profile_id, lease_id):
+        raise DomainError(ErrorCode.LEASE_EXPIRED, "Lease coordination lock is not active")
+    return lease
+
+
 async def renew_lease(
     session: AsyncSession,
     coordinator: RedisCoordinator,
