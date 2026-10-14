@@ -4,6 +4,17 @@
 
 This document is the authoritative build order for AutoBuy v1. It translates the accepted architecture into implementation phases. Agents must preserve dependency order unless a documented technical dependency requires deviation.
 
+## Current implementation status
+
+- Phase 0 — complete
+- Phase 1 — complete foundation
+- Phase 2 — substantially implemented; remaining lifecycle/admin endpoints continue incrementally
+- Phase 3 — pending
+- Phase 4 — core entitlement accounting implemented
+- Phase 5 — Redis coordination, queues, worker registration, heartbeats, renewable leases, stale-lease recovery, and safe reassignment implemented
+- Phase 6 — encrypted retailer-profile artifact foundation implemented; production object-store/KMS adapters remain
+- Phase 7+ — pending
+
 ## Delivery principles
 
 - Build one production-quality vertical slice before broadening scope.
