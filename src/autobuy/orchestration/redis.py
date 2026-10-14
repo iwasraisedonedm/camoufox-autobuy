@@ -8,7 +8,7 @@ from __future__ import annotations
 import hashlib
 import secrets
 from dataclasses import dataclass
-from typing import Final
+from typing import Any, Final, cast
 from uuid import UUID
 
 from redis.asyncio import Redis
@@ -44,7 +44,8 @@ class RedisCoordinator:
 
     def __init__(self, settings: Settings) -> None:
         self._settings = settings
-        self._redis = Redis.from_url(settings.redis_url, decode_responses=True)
+        redis_factory = cast(Any, Redis.from_url)
+        self._redis: Redis = redis_factory(settings.redis_url, decode_responses=True)
         self._prefix = f"{settings.redis_namespace}:{settings.environment}"
 
     def _key(self, *parts: object) -> str:
@@ -54,7 +55,8 @@ class RedisCoordinator:
         await self._redis.aclose()
 
     async def ping(self) -> bool:
-        return bool(await self._redis.ping())
+        ping = cast(Any, self._redis.ping)
+        return bool(await ping())
 
     async def set_worker_heartbeat(self, worker_id: UUID) -> None:
         await self._redis.set(
@@ -123,6 +125,8 @@ class RedisCoordinator:
         if result is None:
             return None
         _, raw_job_id = result
+        if isinstance(raw_job_id, bytes):
+            raw_job_id = raw_job_id.decode("utf-8")
         return UUID(raw_job_id)
 
     async def increment_rate_counter(
