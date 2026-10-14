@@ -9,7 +9,7 @@ from autobuy.workers.profile_store.storage import ObjectStore
 
 
 def profile_encryption_context(profile_id: UUID) -> bytes:
-    return f"autobuy:retailer-profile:{profile_id}".encode("utf-8")
+    return f"autobuy:retailer-profile:{profile_id}".encode()
 
 
 def profile_object_key(profile_id: UUID, artifact_version: int) -> str:

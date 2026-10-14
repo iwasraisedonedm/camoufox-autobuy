@@ -49,7 +49,7 @@ class EncryptedArtifact:
         return json.dumps(asdict(self), separators=(",", ":"), sort_keys=True).encode("utf-8")
 
     @classmethod
-    def from_bytes(cls, raw: bytes) -> "EncryptedArtifact":
+    def from_bytes(cls, raw: bytes) -> EncryptedArtifact:
         data = json.loads(raw.decode("utf-8"))
         if not isinstance(data, dict):
             raise ValueError("Encrypted profile artifact must be a JSON object")
