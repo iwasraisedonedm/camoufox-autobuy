@@ -1,0 +1,21 @@
+browser:
+  backend: patchright
+  engine: chromium
+  headless: false
+  persistent_context: true
+  user_data_dir: profiles/default
+  locale: en-US
+  timezone_id: null
+
+  timeouts:
+    navigation_ms: 15000
+    action_ms: 10000
+
+  lifecycle:
+    reuse_existing_page: true
+    close_on_clean_exit: true
+
+  diagnostics:
+    screenshots_on_error: true
+    trace_enabled: false
+    artifact_dir: artifacts/browser
