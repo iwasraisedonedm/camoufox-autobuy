@@ -1,33 +1,40 @@
 [project]
-name = "camoufox-autobuy"
+name = "autobuy-platform"
 version = "0.1.0"
-description = "Production-oriented product monitoring and assisted checkout framework using Patchright and Chromium."
+description = "Hosted Discord-first commercial purchasing platform with isolated retailer workers."
 readme = "README.md"
 requires-python = ">=3.12,<3.14"
 dependencies = [
-  "aiosqlite>=0.20",
-  "httpx>=0.27",
+  "alembic>=1.14",
+  "asyncpg>=0.30",
+  "cryptography>=44",
+  "discord.py>=2.4",
+  "fastapi>=0.115",
+  "httpx>=0.28",
   "patchright>=1.49",
-  "pydantic>=2.9",
-  "pydantic-settings>=2.6",
+  "pydantic>=2.10",
+  "pydantic-settings>=2.7",
   "pyyaml>=6.0",
+  "redis>=5.2",
   "rich>=13.9",
   "sqlalchemy>=2.0",
   "structlog>=24.4",
   "tenacity>=9.0",
-  "typer>=0.12",
+  "typer>=0.15",
+  "uvicorn[standard]>=0.34",
 ]
 
 [project.scripts]
 autobuy = "autobuy.cli:app"
+autobuy-api = "autobuy.control_plane.main:run"
 
 [dependency-groups]
 dev = [
   "pyright>=1.1.390",
   "pytest>=8.3",
-  "pytest-asyncio>=0.24",
+  "pytest-asyncio>=0.25",
   "pytest-cov>=6.0",
-  "ruff>=0.8",
+  "ruff>=0.9",
 ]
 
 [build-system]
@@ -41,6 +48,9 @@ packages = ["src/autobuy"]
 addopts = "-q --strict-markers --strict-config"
 asyncio_mode = "auto"
 testpaths = ["tests"]
+markers = [
+  "integration: tests requiring infrastructure",
+]
 
 [tool.ruff]
 target-version = "py312"
@@ -48,10 +58,10 @@ line-length = 100
 src = ["src", "tests"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B", "SIM", "ASYNC"]
+select = ["E", "F", "I", "UP", "B", "SIM", "ASYNC", "RUF"]
 
 [tool.pyright]
 pythonVersion = "3.12"
 typeCheckingMode = "strict"
 include = ["src", "tests"]
-exclude = ["profiles", "data", "logs", "secrets"]
+exclude = ["profiles", "data", "logs", "secrets", ".venv"]
