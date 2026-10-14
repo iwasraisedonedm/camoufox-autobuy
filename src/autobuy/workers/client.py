@@ -40,9 +40,7 @@ class WorkerControlPlaneClient:
         return WorkerRead.model_validate(response.json())
 
     async def heartbeat(self, worker_id: UUID) -> WorkerRead:
-        response = await self._client.post(
-            f"/api/v1/internal/workers/{worker_id}/heartbeat"
-        )
+        response = await self._client.post(f"/api/v1/internal/workers/{worker_id}/heartbeat")
         response.raise_for_status()
         return WorkerRead.model_validate(response.json())
 
