@@ -1,21 +1,17 @@
 app:
+  name: camoufox-autobuy
   environment: local
   log_level: INFO
+  config_version: 1
 
-browser:
-  backend: patchright
-  headless: false
-  user_data_dir: profiles/default
-  locale: en-US
-  timezone_id: America/Los_Angeles
-  navigation_timeout_ms: 15000
-
-monitor:
-  interval_seconds: 3.0
-
-workflow:
-  mode: dry_run
-  require_manual_confirmation: true
-
-database:
-  url: sqlite+aiosqlite:///data/autobuy.sqlite3
+paths:
+  browser_config: config/browser.yaml
+  monitoring_config: config/monitoring.yaml
+  workflow_config: config/workflow.yaml
+  retailers_config: config/retailers.yaml
+  products_config: config/products.yaml
+  logging_config: config/logging.yaml
+  local_profile_config: secrets/profiles.local.yaml
+  data_dir: data
+  logs_dir: logs
+  profiles_dir: profiles
