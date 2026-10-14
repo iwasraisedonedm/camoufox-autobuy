@@ -74,7 +74,7 @@ Discord is an interface adapter, never a source of truth.
 
 The worker plane executes retailer automation.
 
-Workers are dynamically assigned through renewable leases. A worker restores the encrypted customer retailer profile, launches a persistent Patchright/Chromium context, monitors configured targets, and executes authorized purchase workflows.
+Workers are dynamically assigned through renewable leases. A worker restores the encrypted customer retailer profile, prepares the retailer runtime, monitors configured targets, and executes authorized purchase workflows through the retailer adapter.
 
 Workers do not own customer or entitlement truth.
 
@@ -542,3 +542,14 @@ Worker plane:
 - bounded retry logic
 
 Best Buy is the reference adapter. Additional retailers are chosen by commercial demand after Best Buy reaches production quality.
+
+
+## Retailer execution transport
+
+The platform above the retailer-adapter boundary is transport-agnostic. A supported retailer adapter may use browser automation, a retailer-supported structured interaction, or a combination of both for different operations.
+
+Monitoring and checkout transport are independent implementation decisions. Selection is based on measured reliability and latency while preserving the same purchase guards, state transitions, idempotency rules, reconciliation behavior, and customer-visible outcomes.
+
+The execution path should be prepared before an availability event whenever practical. Authenticated retailer state, normalized product identity, selected variant, purchase limits, and runtime readiness should already be established so Discord and avoidable setup work remain outside the latency-critical purchase path.
+
+Discord remains the control and notification surface. It is not part of the hot execution path once a Monitoring Job is active.
