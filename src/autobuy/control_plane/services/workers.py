@@ -179,9 +179,7 @@ async def renew_lease(
         await session.commit()
         raise DomainError(ErrorCode.LEASE_EXPIRED, "Lease coordination lock has expired")
 
-    lease.expires_at = datetime.now(UTC) + timedelta(
-        seconds=settings.worker_lease_ttl_seconds
-    )
+    lease.expires_at = datetime.now(UTC) + timedelta(seconds=settings.worker_lease_ttl_seconds)
     await session.commit()
     await session.refresh(lease)
     return lease

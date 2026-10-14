@@ -64,9 +64,7 @@ async def acquire_lease_route(
         worker_id=payload.worker_id,
         retailer_profile_id=payload.retailer_profile_id,
     )
-    return LeaseAcquireResponse.model_validate(lease).model_copy(
-        update={"lease_token": raw_token}
-    )
+    return LeaseAcquireResponse.model_validate(lease).model_copy(update={"lease_token": raw_token})
 
 
 @router.post("/leases/{lease_id}/renew", response_model=LeaseRead)
