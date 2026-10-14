@@ -1,0 +1,15 @@
+retailers:
+  example_retailer:
+    enabled: false
+    adapter: example
+    session_profile: default
+    base_url: "https://example.com"
+
+    behavior:
+      require_authenticated_session: true
+      prefer_saved_shipping: true
+      prefer_saved_payment: true
+
+    limits:
+      max_parallel_sessions: 1
+      minimum_request_interval_seconds: 1.0
