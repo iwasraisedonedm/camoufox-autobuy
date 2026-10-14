@@ -63,9 +63,9 @@ Do not silently override an accepted decision. If implementation reality conflic
 
 - Python 3.12+
 - asyncio
-- Patchright
-- Chromium
 - retailer adapter registry
+- browser automation support
+- supported structured retailer integrations where appropriate
 - encrypted persistent retailer profiles
 - retailer-specific queues
 - renewable worker leases
@@ -88,7 +88,7 @@ Do not silently override an accepted decision. If implementation reality conflic
 3. Discord is an interface, never authoritative state.
 4. Unlock/payment service grants entitlements through authenticated API, never direct DB writes.
 5. Retailer-specific behavior lives only in retailer adapters.
-6. Patchright-specific implementation lives only in browser/worker infrastructure.
+6. Transport-specific retailer implementation lives only inside retailer adapters and worker infrastructure; it must not leak into control-plane or Discord code.
 7. Retailer profile plaintext exists only in active worker runtime.
 8. One active writer per RetailerProfile.
 9. Workers are disposable compute.
@@ -189,6 +189,11 @@ If a retailer explicitly requires human verification/access control, transition 
 - ambiguous/irreversible states require reconciliation
 
 ## Retailer adapter rules
+
+Retailer adapters are transport-agnostic at their public boundary. Monitoring and checkout may use browser automation, a retailer-supported structured integration, or both. The rest of the platform must interact only through the normalized adapter contract.
+
+Transport selection should be justified by measured reliability and latency, without changing purchase guards, error semantics, or reconciliation behavior.
+
 
 Every adapter conforms to `docs/RETAILER-ADAPTER-SPEC.md`.
 
