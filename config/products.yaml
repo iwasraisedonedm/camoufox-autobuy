@@ -1,0 +1,8 @@
+products:
+  example:
+    retailer: target
+    url: "https://example.com/product"
+    quantity: 1
+    max_price: 749.99
+    profile: personal
+    enabled: false
