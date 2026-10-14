@@ -112,3 +112,29 @@ class MonitoringJobRead(BaseModel):
     created_at: datetime
     started_at: datetime | None
     completed_at: datetime | None
+
+
+class OrderConfirmRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    retailer_order_reference: str = Field(min_length=1, max_length=200)
+    quantity_confirmed: int = Field(ge=1, le=100)
+    unit_price: Decimal | None = Field(default=None, gt=0)
+    currency: str = Field(default="USD", min_length=3, max_length=3)
+    confirmed_at: datetime
+
+
+class OrderRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    customer_id: UUID
+    retailer_profile_id: UUID
+    job_id: UUID
+    purchase_attempt_id: UUID
+    retailer_order_reference: str
+    quantity_confirmed: int
+    unit_price: Decimal | None
+    currency: str
+    confirmed_at: datetime
+    created_at: datetime
