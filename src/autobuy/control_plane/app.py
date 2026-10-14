@@ -1,12 +1,16 @@
 """FastAPI application factory."""
 
+from collections.abc import Awaitable, Callable
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 from uuid import uuid4
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 
+from autobuy.control_plane.routes.customers import router as customers_router
+from autobuy.control_plane.routes.entitlements import router as entitlements_router
+from autobuy.control_plane.routes.health import router as health_router
 from autobuy.domain.errors import DomainError
 from autobuy.observability.logging import configure_logging
 from autobuy.persistence.database import Database
@@ -31,15 +35,19 @@ def create_app() -> FastAPI:
     app.state.database = database
 
     @app.middleware("http")
-    async def request_id_middleware(request: Request, call_next):  # type: ignore[no-untyped-def]
+    async def request_id_middleware(
+        request: Request,
+        call_next: Callable[[Request], Awaitable[Response]],
+    ) -> Response:
         request_id = request.headers.get("X-Request-ID") or str(uuid4())
+        request.state.request_id = request_id
         response = await call_next(request)
         response.headers["X-Request-ID"] = request_id
         return response
 
     @app.exception_handler(DomainError)
     async def domain_error_handler(request: Request, exc: DomainError) -> JSONResponse:
-        request_id = request.headers.get("X-Request-ID") or str(uuid4())
+        request_id = getattr(request.state, "request_id", str(uuid4()))
         return JSONResponse(
             status_code=409,
             content={
@@ -52,7 +60,7 @@ def create_app() -> FastAPI:
             },
         )
 
-    from autobuy.control_plane.routes.health import router as health_router
-
     app.include_router(health_router)
+    app.include_router(customers_router)
+    app.include_router(entitlements_router)
     return app
