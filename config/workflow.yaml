@@ -1,0 +1,24 @@
+workflow:
+  mode: dry_run
+  require_manual_confirmation: true
+
+  guards:
+    validate_retailer: true
+    validate_product: true
+    validate_variant: true
+    validate_quantity: true
+    validate_max_price: true
+    prevent_duplicate_orders: true
+
+  retries:
+    safe_reads:
+      attempts: 3
+      min_wait_seconds: 0.25
+      max_wait_seconds: 2.0
+    irreversible_actions:
+      attempts: 1
+
+  completion:
+    disable_job_after_success: true
+    persist_success_before_exit: true
+    ambiguous_outcome_requires_review: true
