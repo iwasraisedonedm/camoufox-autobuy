@@ -22,9 +22,7 @@ _ALLOWED: dict[JobStatus, frozenset[JobStatus]] = {
             JobStatus.FAILED,
         }
     ),
-    JobStatus.ITEM_FOUND: frozenset(
-        {JobStatus.VALIDATING, JobStatus.MONITORING, JobStatus.FAILED}
-    ),
+    JobStatus.ITEM_FOUND: frozenset({JobStatus.VALIDATING, JobStatus.MONITORING, JobStatus.FAILED}),
     JobStatus.VALIDATING: frozenset(
         {JobStatus.ADDING_TO_CART, JobStatus.MONITORING, JobStatus.FAILED}
     ),
@@ -36,9 +34,7 @@ _ALLOWED: dict[JobStatus, frozenset[JobStatus]] = {
             JobStatus.FAILED,
         }
     ),
-    JobStatus.CART_CONFIRMED: frozenset(
-        {JobStatus.CHECKOUT_PREPARING, JobStatus.FAILED}
-    ),
+    JobStatus.CART_CONFIRMED: frozenset({JobStatus.CHECKOUT_PREPARING, JobStatus.FAILED}),
     JobStatus.CHECKOUT_PREPARING: frozenset(
         {JobStatus.CHECKOUT_READY, JobStatus.ACTION_REQUIRED, JobStatus.FAILED}
     ),

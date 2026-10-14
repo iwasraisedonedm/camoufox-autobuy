@@ -45,9 +45,7 @@ async def grant_entitlement(
 
     now = datetime.now(UTC)
     status = (
-        EntitlementStatus.ACTIVE
-        if starts_at <= now < expires_at
-        else EntitlementStatus.PENDING
+        EntitlementStatus.ACTIVE if starts_at <= now < expires_at else EntitlementStatus.PENDING
     )
 
     entitlement = ServiceEntitlement(
