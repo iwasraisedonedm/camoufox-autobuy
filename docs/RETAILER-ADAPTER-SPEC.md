@@ -6,6 +6,14 @@ Every supported retailer integration implements one normalized contract so the c
 
 Best Buy is the reference adapter.
 
+## Transport independence
+
+The retailer adapter contract is transport-agnostic. An adapter may use browser automation, a retailer-supported structured integration, or both for different operations.
+
+Monitoring and checkout transport are independent implementation decisions. The rest of the platform must depend only on normalized adapter results.
+
+Transport choice should be based on measured reliability, latency, and session stability.
+
 ## Boundary
 
 Retailer adapters own:
