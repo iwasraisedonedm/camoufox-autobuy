@@ -137,6 +137,8 @@ Purchase flow:
 - ambiguous-submission rate
 - median/p95 monitoring latency
 - median/p95 checkout latency
+- transport selected per retailer operation
+- per-transport success/error rate
 
 ### Worker
 
