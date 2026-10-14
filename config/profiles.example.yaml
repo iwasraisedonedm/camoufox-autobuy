@@ -1,0 +1,12 @@
+# This tracked file contains references only.
+# Real names, addresses, credentials, payment information, and account details
+# belong in local ignored files or a secure secret store.
+
+profiles:
+  default:
+    customer_ref: local_customer_default
+    shipping_ref: local_shipping_default
+    billing_ref: local_billing_default
+    account_ref: local_account_default
+    payment_ref: retailer_saved_default
+    browser_profile_ref: default
