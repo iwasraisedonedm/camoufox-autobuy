@@ -228,3 +228,10 @@ Restore procedures must preserve encryption/key compatibility.
 ## Access-control boundary
 
 The system may maintain consistent authenticated browser sessions and ordinary retailer workflows. When a retailer requires an explicit human verification or access-control step, pause and request customer action rather than attempting to defeat that control.
+
+
+## Transport-specific session data
+
+Retailer integrations may use authenticated session-bound data through more than one implementation mechanism. Treat this data with the same sensitivity regardless of transport.
+
+It must not be exposed to Discord, written to normal logs, committed to the repository, or shared across customers. Existing encryption, isolation, and lifecycle controls apply uniformly.
