@@ -1,5 +1,7 @@
 """Transactional confirmed-order accounting."""
 
+from datetime import datetime
+from decimal import Decimal
 from uuid import UUID
 
 from sqlalchemy import select
@@ -22,9 +24,9 @@ async def confirm_order(
     attempt_id: UUID,
     retailer_order_reference: str,
     quantity_confirmed: int,
-    unit_price,
+    unit_price: Decimal | None,
     currency: str,
-    confirmed_at,
+    confirmed_at: datetime,
 ) -> Order:
     existing = await session.scalar(select(Order).where(Order.purchase_attempt_id == attempt_id))
     if existing is not None:
