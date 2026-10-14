@@ -6,7 +6,7 @@ import base64
 import json
 import os
 from dataclasses import asdict, dataclass
-from typing import Protocol
+from typing import Protocol, cast
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
@@ -50,18 +50,30 @@ class EncryptedArtifact:
 
     @classmethod
     def from_bytes(cls, raw: bytes) -> EncryptedArtifact:
-        data = json.loads(raw.decode("utf-8"))
-        if not isinstance(data, dict):
+        parsed: object = json.loads(raw.decode("utf-8"))
+        if not isinstance(parsed, dict):
             raise ValueError("Encrypted profile artifact must be a JSON object")
+        data = cast(dict[str, object], parsed)
+
+        version = data.get("version")
+        if not isinstance(version, int):
+            raise ValueError("Encrypted profile artifact version is invalid")
+
+        def required_str(field: str) -> str:
+            value = data.get(field)
+            if not isinstance(value, str):
+                raise ValueError(f"Encrypted profile artifact field {field!r} is invalid")
+            return value
+
         return cls(
-            version=int(data["version"]),
-            algorithm=str(data["algorithm"]),
-            key_wrap_algorithm=str(data["key_wrap_algorithm"]),
-            key_id=str(data["key_id"]),
-            nonce_b64=str(data["nonce_b64"]),
-            ciphertext_b64=str(data["ciphertext_b64"]),
-            wrapped_key_b64=str(data["wrapped_key_b64"]),
-            wrap_nonce_b64=str(data["wrap_nonce_b64"]),
+            version=version,
+            algorithm=required_str("algorithm"),
+            key_wrap_algorithm=required_str("key_wrap_algorithm"),
+            key_id=required_str("key_id"),
+            nonce_b64=required_str("nonce_b64"),
+            ciphertext_b64=required_str("ciphertext_b64"),
+            wrapped_key_b64=required_str("wrapped_key_b64"),
+            wrap_nonce_b64=required_str("wrap_nonce_b64"),
         )
 
 

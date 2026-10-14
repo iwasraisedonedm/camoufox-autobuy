@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from uuid import uuid4
 
 import pytest
@@ -9,7 +10,7 @@ from autobuy.workers.profile_store.storage import FilesystemObjectStore
 
 
 @pytest.mark.asyncio
-async def test_profile_artifact_filesystem_round_trip(tmp_path) -> None:
+async def test_profile_artifact_filesystem_round_trip(tmp_path: Path) -> None:
     profile_id = uuid4()
     store = FilesystemObjectStore(tmp_path)
     service = ProfileArtifactService(
