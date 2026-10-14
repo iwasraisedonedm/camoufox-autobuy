@@ -1,0 +1,21 @@
+app:
+  environment: local
+  log_level: INFO
+
+browser:
+  backend: patchright
+  headless: false
+  user_data_dir: profiles/default
+  locale: en-US
+  timezone_id: America/Los_Angeles
+  navigation_timeout_ms: 15000
+
+monitor:
+  interval_seconds: 3.0
+
+workflow:
+  mode: dry_run
+  require_manual_confirmation: true
+
+database:
+  url: sqlite+aiosqlite:///data/autobuy.sqlite3
