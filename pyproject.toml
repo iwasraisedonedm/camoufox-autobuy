@@ -28,6 +28,7 @@ dependencies = [
 [project.scripts]
 autobuy = "autobuy.cli:app"
 autobuy-api = "autobuy.control_plane.main:run"
+autobuy-worker = "autobuy.workers.main:run"
 
 [dependency-groups]
 dev = [

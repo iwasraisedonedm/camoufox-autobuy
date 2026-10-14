@@ -26,6 +26,9 @@ class Settings(BaseSettings):
     worker_heartbeat_ttl_seconds: int = Field(default=30, ge=5, le=300)
     worker_lease_ttl_seconds: int = Field(default=45, ge=10, le=600)
     profile_store_dir: Path = Path("data/profile-artifacts")
+    control_plane_base_url: str = "http://127.0.0.1:8000"
+    worker_poll_timeout_seconds: int = Field(default=2, ge=1, le=30)
+    worker_heartbeat_interval_seconds: int = Field(default=10, ge=2, le=120)
 
 
 @lru_cache

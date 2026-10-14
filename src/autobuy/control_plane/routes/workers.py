@@ -6,6 +6,7 @@ from fastapi import APIRouter
 
 from autobuy.control_plane.dependencies import Coordinator, DbSession, InternalService
 from autobuy.control_plane.schemas import (
+    JobAssignmentRead,
     LeaseAcquireRequest,
     LeaseAcquireResponse,
     LeaseMutationRequest,
@@ -14,6 +15,7 @@ from autobuy.control_plane.schemas import (
     WorkerRead,
     WorkerRegisterRequest,
 )
+from autobuy.control_plane.services.jobs import get_job_assignment
 from autobuy.control_plane.services.workers import (
     acquire_lease,
     expire_stale_leases,
@@ -112,3 +114,26 @@ async def reap_expired_leases_route(
 ) -> LeaseReapResponse:
     expired = await expire_stale_leases(session, coordinator)
     return LeaseReapResponse(expired_leases=expired)
+
+
+@router.get("/jobs/{job_id}/assignment", response_model=JobAssignmentRead)
+async def get_job_assignment_route(
+    job_id: UUID,
+    session: DbSession,
+    _: InternalService,
+) -> JobAssignmentRead:
+    job, target, offering = await get_job_assignment(session, job_id=job_id)
+    return JobAssignmentRead(
+        job_id=job.id,
+        retailer_code=offering.retailer_code,
+        retailer_profile_id=job.retailer_profile_id,
+        purchase_target_id=target.id,
+        retailer_product_id=target.retailer_product_id,
+        retailer_variant_id=target.retailer_variant_id,
+        product_url=target.url,
+        workflow_mode=job.workflow_mode,
+        max_unit_price=job.max_unit_price,
+        currency=job.currency,
+        quantity_requested=job.quantity_requested,
+        expires_at=job.expires_at,
+    )

@@ -196,3 +196,32 @@ async def start_monitoring_job(
 
     await coordinator.enqueue_job(offering.retailer_code, job.id)
     return job
+
+
+async def get_job_assignment(
+    session: AsyncSession,
+    *,
+    job_id: UUID,
+) -> tuple[MonitoringJob, PurchaseTarget, RetailerOffering]:
+    job = await session.get(MonitoringJob, job_id)
+    if job is None:
+        raise DomainError(ErrorCode.JOB_NOT_FOUND, "Monitoring job does not exist")
+    if job.status not in {
+        JobStatus.QUEUED,
+        JobStatus.MONITORING,
+        JobStatus.ITEM_FOUND,
+        JobStatus.VALIDATING,
+        JobStatus.ACTION_REQUIRED,
+        JobStatus.PAUSED,
+    }:
+        raise DomainError(ErrorCode.JOB_NOT_ACTIVE, "Monitoring job is not assignable")
+
+    target = await session.get(PurchaseTarget, job.purchase_target_id)
+    if target is None:
+        raise DomainError(ErrorCode.INVALID_TARGET, "Purchase target is unavailable")
+
+    offering = await session.get(RetailerOffering, target.retailer_offering_id)
+    if offering is None or offering.status != "active":
+        raise DomainError(ErrorCode.RETAILER_UNAVAILABLE, "Retailer offering is unavailable")
+
+    return job, target, offering

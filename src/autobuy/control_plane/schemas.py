@@ -216,3 +216,18 @@ class ProfileArtifactMetadataRead(BaseModel):
 class ProfileArtifactCheckpointRequest(ProfileArtifactAccessRequest):
     encrypted_artifact_ref: str = Field(min_length=1, max_length=2048)
     artifact_version: int = Field(ge=1)
+
+
+class JobAssignmentRead(BaseModel):
+    job_id: UUID
+    retailer_code: str
+    retailer_profile_id: UUID
+    purchase_target_id: UUID
+    retailer_product_id: str
+    retailer_variant_id: str | None
+    product_url: str
+    workflow_mode: WorkflowMode
+    max_unit_price: Decimal
+    currency: str
+    quantity_requested: int
+    expires_at: datetime
