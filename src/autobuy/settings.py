@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     api_host: str = "127.0.0.1"
     api_port: int = Field(default=8000, ge=1, le=65535)
     internal_service_token: str | None = None
+    redis_namespace: str = "autobuy"
+    worker_heartbeat_ttl_seconds: int = Field(default=30, ge=5, le=300)
+    worker_lease_ttl_seconds: int = Field(default=45, ge=10, le=600)
 
 
 @lru_cache
