@@ -78,7 +78,7 @@ Cover:
 
 ### Retailer adapter tests
 
-Use sanitized fixtures and mocked browser/page interfaces.
+Use sanitized fixtures and mocked retailer-transport interfaces.
 
 Cover:
 
@@ -93,6 +93,8 @@ Cover:
 - selector failure classification
 
 Never store customer data or authenticated profile material in fixtures.
+
+Where an adapter supports multiple implementation mechanisms, run the same normalized contract tests against each supported path.
 
 ### Browser smoke tests
 
