@@ -151,7 +151,6 @@ async def create_monitoring_job(
     return job
 
 
-
 async def start_monitoring_job(
     session: AsyncSession,
     coordinator: RedisCoordinator,

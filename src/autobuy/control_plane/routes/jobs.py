@@ -46,7 +46,6 @@ async def get_job(job_id: UUID, session: DbSession) -> MonitoringJob:
     return job
 
 
-
 @router.post("/{job_id}/start", response_model=MonitoringJobRead)
 async def start_job(
     job_id: UUID,
