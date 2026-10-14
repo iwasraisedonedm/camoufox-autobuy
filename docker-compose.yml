@@ -1,0 +1,30 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: autobuy
+      POSTGRES_USER: autobuy
+      POSTGRES_PASSWORD: autobuy-local
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U autobuy -d autobuy"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    ports:
+      - "127.0.0.1:6379:6379"
+
+volumes:
+  postgres-data:
