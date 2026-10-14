@@ -8,6 +8,10 @@ It is done when it satisfies the applicable engineering, security, operational, 
 
 ## Functional
 
+- retailer transport stays behind the adapter boundary
+- changes to retailer transport preserve the normalized adapter contract
+
+
 - requested behavior implemented
 - expected success path tested
 - relevant failure paths tested
