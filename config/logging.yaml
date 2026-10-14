@@ -1,0 +1,30 @@
+logging:
+  format: json
+  level: INFO
+  timestamps: utc
+
+  outputs:
+    console: true
+    file:
+      enabled: true
+      path: logs/autobuy.jsonl
+      rotate_mb: 25
+      backups: 5
+
+  redaction:
+    enabled: true
+    keys:
+      - password
+      - passcode
+      - token
+      - authorization
+      - cookie
+      - session
+      - card_number
+      - cvv
+      - cvc
+      - account_number
+      - routing_number
+      - address
+      - phone
+      - email
