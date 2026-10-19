@@ -1,6 +1,7 @@
 """Worker executable entry point."""
 
 import asyncio
+from uuid import UUID
 
 from autobuy.adapters.registry import AdapterRegistry
 from autobuy.control_plane.schemas import JobAssignmentRead
@@ -9,7 +10,7 @@ from autobuy.settings import get_settings
 from autobuy.workers.runtime import WorkerRuntime
 
 
-async def _unconfigured_handler(worker_id, assignment: JobAssignmentRead) -> None:
+async def _unconfigured_handler(worker_id: UUID, assignment: JobAssignmentRead) -> None:
     raise RuntimeError(
         f"No execution handler configured for worker {worker_id} and job {assignment.job_id}"
     )
